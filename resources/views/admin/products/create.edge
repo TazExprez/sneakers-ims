@@ -1,0 +1,100 @@
+{{--  Here we are making the create page.  You cannot skip a line between this comment and the @layout tag, or you will have issues.  --}}
+@layout('layouts.admin')
+
+@section('breadcrumbs')
+    <div class="breadcrumbs-area clearfix">
+        <h4 class="page-title pull-left">Products</h4>
+        <ul class="breadcrumbs pull-left">
+            <li><a href="/admin">Dashboard</a></li>
+            <li><a href="/admin/products">All Products</a></li>
+            <li><span>Create New Product</span></li>
+        </ul>
+    </div>
+@endsection
+
+@section('content')
+    <div class="row">
+        {{--  We copy and pasted this form from the SRTDash template.  We took it from the Form subsection in the UI Features section.  --}}
+        <div class="col-12 mt-5">
+            <div class="card">
+                <div class="card-body">
+                    {{--  This is a form, so we actually have to use the form tag. We are going to be using the post method with this form.  We are going to submit the form to the /admin/products URL, so we set the action to that.  --}}
+                    <form action="/admin/products" method="post">
+                        {{--  In order to use a CSRF token, you just have to put the csrfField function at the top of the form in your edge templates.  This will generate a CSRF token in the backend.  --}}
+                        {{--  Joe said that this function will create an input type hidden field with a CSRF value.  When we inpected the page, there indeed was an input element with the type hidden, the name _csrf, and a long random value.  Every time we refresed the page, the random value would change.  --}}
+                        {{--  After we put the csrfField function below, we are submitting the form, but nothing is happening.  This is happening because we did not put anything in the store function in the ProductController.js file.  After we made the store function return the string Hey!, it would return the string when we submitted the form.  This is happening because we use the store method of the ProductController class in order to handle POST requests to the /admin/products URL.  --}}
+                        {{ csrfField() }}
+                        <div class="form-group">
+                            <label for="example-text-input" class="col-form-label">Title</label>
+                            {{--  We are going to name each input according to the name of the corresponding column in the database.  --}}
+                            <input class="form-control" type="text" value="" name="title" id="example-text-input" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            {{--  We are just going to be getting the image URL because this course is focused on MySQL.  This is not really focused on the full stack.  In production, this would be a file upload.  If you want, you can add more features to this project after the lessons are done for this course.  --}}
+                            <label for="example-text-input" class="col-form-label">Image URL</label>
+                            {{--  We are going to name each input according to the name of the corresponding column in the database.  --}}
+                            <input class="form-control" type="text" value="" name="img_url" id="example-text-input" autocomplete="off">
+                        </div>
+                        <div class="form-group row">
+                            {{--  We removed the tags separating the SKU and Material elements in order to put them in the same form group.  We also added the row class to the div above with the form group class.  We put the SKU and Material elements inside of a div with the col-sm-12 and the col-md-6 classes.  All this will put the SKU and Material elements inside of the same row, with each one occupying half of it when the screen is at a medium width.  When the screen is at a small width, the SKU and Material elements will be on a different row and occupy the entire width.  Everything above mobile will use two columns.  This is using Bootstrap.  I noticed that when I originally left out the col-md-6 class, that the page was still responsive with just the col-sm-6 class.  Maybe the col-sm-12 and the col-md-6 classes were not needed.  Maybe the row class on the parent div made this unnecessary.  --}}
+                            <div class="col-sm-12 col-md-6">
+                                <label for="example-text-input" class="col-form-label">SKU</label>
+                                <input class="form-control" type="text" value="" name="sku" id="example-text-input" autocomplete="off">
+                            </div>
+                            <div class="col-sm-12 col-md-6">
+                                <label for="example-text-input" class="col-form-label">Material</label>
+                                <input class="form-control" type="text" value="" name="material" id="example-text-input" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-12 col-md-4">
+                                <label for="example-text-input" class="col-form-label">Quantity</label>
+                                <input class="form-control" type="text" value="" name="qty" id="example-text-input" autocomplete="off">
+                            </div>
+                            {{--  We added this div element and made this occupy one-third of the row width when the screen size is at a medium width, or larger.  We also changed this for the other two div elements that are located inside of the same div element as this one.  At a small width, this occupies the entire row, just like the other two.  --}}
+                            <div class="col-sm-12 col-md-4">
+                                <label for="example-text-input" class="col-form-label">Size</label>
+                                {{--  Here we changed the input element to the select element.  --}}
+                                <select class="custom-select" name="size">
+                                    <option value="7" selected="selected">7</option>
+                                    <option value="7.5">7.5</option>
+                                    <option value="8">8</option>
+                                    <option value="8.5">8.5</option>
+                                    <option value="9">9</option>
+                                    <option value="9.5">9.5</option>
+                                    <option value="10">10</option>
+                                    <option value="10.5">10.5</option>
+                                    <option value="11">11</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <label class="col-form-label">Brands</label>
+                                {{--  We had to add the name property to this select element and set it to brand_id.  The product.brand_id was being set to NULL because we had not done this and was causing the second product in the products table to not be displayed on the /admin/products page.  We had to manually enter the product.brand_id value for the second product to have it displayed on the /admin/products page.  We must remember to name our form elements.  --}}
+                                <select class="custom-select" name="brand_id">
+                                    {{--  We copied this from the edit.edge file in the products directory.  We are going to populate the options for this select element from the database.  --}}
+                                    @each(brand in brands)
+                                        <option 
+                                            value="{{brand.id}}"
+                                            {{(brand.id == product.brand_id) ? 'selected="selected"' : ''}}
+                                        >
+                                            {{brand.title}}
+                                        </option>
+                                    @endeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="example-text-input" class="col-form-label">Description</label>
+                            <textarea class="form-control" name="description" id="" rows="8" cols="80"></textarea>
+                        </div>
+                        <div class="form-group">
+                            {{--  We had to change the button to the submit type because when it had the button type, the form would not be submitted.  --}}
+                            {{--  When we first submitted this form we got an Invalid CSRF token error.  CSRF stands for cross-site request forgery.  In order to get this form to work, we actually have to put in a CSRF token, which is going to save you from a CSRF attack.  When somebody is trying to make a POST request to your website, from another website, they will actually need the CSRF token, the code, in order to POST into your website.  This will save you from having people send bad things to your website.  In order to put this CSRF token, you just have to put the csrfField function at the top of the form.  --}}
+                            <button type="submit" class="btn btn-primary mb-3">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection

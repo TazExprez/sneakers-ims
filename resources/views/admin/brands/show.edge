@@ -1,0 +1,68 @@
+{{--  Here we are making the show page.  --}}
+@layout('layouts.admin')
+
+@section('breadcrumbs')
+    <div class="breadcrumbs-area clearfix">
+        <h4 class="page-title pull-left">Brands</h4>
+        <ul class="breadcrumbs pull-left">
+            <li><a href="/admin">Dashboard</a></li>
+            <li><a href="/admin/brands">All Brands</a></li>
+            <li><span>{{brand.title}}</span></li>
+        </ul>
+    </div>
+@endsection
+
+@section('content')
+    <div id="brands-show-page" class="row">
+        {{--  In Bootstrap, we want to create enough columns that add up to 12.  --}}
+        <div class="col-md-9 mt-5">
+            <div class="card">
+                <div class="card-body">
+                    {{--  We had to put the div.col-md-4 and the div.col-md-8 inside of this div.row so that they would share the same row, instead of being on separate rows.  --}}
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img 
+                                style="width: 100%;"
+                                src="{{brand.img_url}}" 
+                                class="show-brands-img"
+                            >
+                        </div>
+                        <div class="col-md-8">
+                            <h2>{{brand.title}}</h2>
+                            <p>
+                                <span>
+                                    Description:
+                                </span>
+                                {{brand.description}}
+                            </p>
+                            <div class="details row">
+                                <div class="col-md-3">
+                                    <h4>Created By</h4>
+                                    {{--  We are keeping this one with the product.user in case later on we mess around with the view.  --}}
+                                    <span>{{brand.user}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mt-5">
+            <div class="card">
+                <div class="card-body">
+                    {{--  We turned this button element into an a element.  We also ended up making this a block level element.  --}}
+                    <a href="/admin/brands/{{brand.id}}/edit" class="btn btn-primary btn-lg btn-block">
+                        Edit
+                        <i class="ti-pencil-alt"></i>
+                    </a>
+                    {{--  In a REST API, we will most likely do a POST request to do a delete.  For us, since this site is an internal tool, we can sort of cheat, in the sense that we do not have to have this as a POST request.  --}}
+                    {{--  We added a confirm box to the onclick handler so that the user has to confirm that he or she really wants to delete a product.  --}}
+                    <a href="/admin/brands/{{brand.id}}/delete" class="btn btn-danger btn-lg btn-block" onclick="return confirm('Are you sure?');">
+                        Delete
+                        <i class="ti-trash"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection

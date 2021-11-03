@@ -1,0 +1,104 @@
+{{--  We copied all of the edge template files in the products directory and placed them in this orders directory.  We did this because the files are going to be similar.  --}}
+{{--  If writing comments up here, remember to never skip a line between them because the @layout must be at the top, right underneath any comments, and without any new line spaces above it.  --}}
+{{--  This is the layout file that we are going to use and put our content of this all.edge file inside of.  It must be on the first line of this, or any other file, that uses the layout.  We use layouts.admin as the argument because the layout is named admin.edge and it is inside of the layouts folder.  --}}
+@layout('layouts.admin')
+
+{{--  This section is going to deal with the area under the search area.  --}}
+@section('breadcrumbs')
+    <div class="breadcrumbs-area clearfix">
+        <h4 class="page-title pull-left">Products</h4>
+        <ul class="breadcrumbs pull-left">
+            <li><a href="index.html">Dashboard</a></li>
+            <li><span>All Products</span></li>
+        </ul>
+    </div>
+@endsection
+
+{{--  This is our content area.  This section is named content.  This will be displayed in the admin.edge layout file that we created in the location where we put the export for this content section.  This will happen in the area of the admin.edge file where we wrote @!section('content').  --}}
+@section('content')
+    {{--  Joe decided to create a new div.row here.  --}}
+    <div class="row">
+        {{--  Here we are pasting all of the HTML from the last table included in SRTDash.  We just had to inspect the element, then right click on Edit as HTML, then just copy everything.  This will display the table on the page.  --}}
+        <div class="col-12 mt-5">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="header-title">Progress Table</h4>
+                    <div class="single-table">
+                        <div class="table-responsive">
+                            <table class="table table-hover progress-table text-center">
+                                <thead class="text-uppercase">
+                                    <tr>
+                                        <th scope="col">ID</th>
+                                        <th scope="col">Title</th>
+                                        <th scope="col">SKU</th>
+                                        <th scope="col">Material</th>
+                                        <th scope="col">Quantity</th>
+                                        <th scope="col">Size</th>
+                                        {{--  We are going to eventually use this with the brand id.  --}}
+                                        <th scope="col">Brand</th>
+                                        {{--  We are going to eventually use this with the user id.  --}}
+                                        <th scope="col">Created By</th>
+                                        {{--  We just created this th element and will do something cool with this column later on.  --}}
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Options</th>
+                                        {{--  We are going to have to work on the Brand and the Created By columns.  In the database, this is a one to many relationship. Joe said there is one product that is attached to a brand and one product created by one user.  This is why we have a brand id and a user id.  We will do some joins to get all of that data in one single query.  --}}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{--  at-each allows us to loop over []s and {}s.  This is similar to a for of loop in JavaScript.  Now we can simply use at-end to close the at-each, instead of doing it like Joe, with an at-endeach.  We are going to loop over every single product that we have in the allProducts[].  We are going to place the remaining tr element in this loop.  --}}
+                                    @each(product in allProducts)
+                                        <tr>
+                                            <th scope="row">{{product.id}}</th>
+                                            {{--  Here we are printing out the title of the first product, which is going to be at the 0 index of the allProducts[].  We did this by inserting allProducts[0].title inside of a {{}}.  This is before we introduce a loop.  --}}
+                                            {{--  After we do the loop, this will print out the title of each product as we loop through each one.  Each product will be on its own row.  --}}
+                                            {{--  We eventually turned this into a link and wrapped the the product.title inside of the a element.  When a user clicks on this, the user will be taken to the show page for the product.  --}}
+                                            <td>
+                                                <a href="/admin/products/{{product.id}}">
+                                                    {{product.title}}
+                                                </a>
+                                            </td>
+                                            <td>{{product.sku}}</td>
+                                            <td>{{product.material}}</td>
+                                            <td>{{product.qty}}</td>
+                                            <td>{{product.size}}</td>
+                                            <td>
+                                                {{--  We deleted the div.progress from here.  --}}
+                                                {{product.brand}}
+                                            </td>
+                                            {{--  We created another column for the user's full name.  --}}
+                                            <td>
+                                                {{product.user}}
+                                            </td>
+                                            <td><span class="status-p bg-primary">pending</span></td>
+                                            <td>
+                                                <ul class="d-flex justify-content-center">
+                                                    <li class="mr-3">
+                                                        {{--  This is the URL that we send the user to edit the product.  --}}
+                                                        <a href="/admin/products/{{product.id}}/edit" class="text-secondary">
+                                                            <i class="fa fa-edit"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        {{--  This is the URL that we send the user to delete the product.  --}}
+                                                        {{--  We added an onclick handler to have the user confirm that he or she really wants to delete a product.  This way the user will get some time to think about about he or she really wants to delete a product.  --}}
+                                                        <a href="/admin/products/{{product.id}}/delete" class="text-danger" onclick="return confirm('Are you sure?');">
+                                                            <i class="ti-trash"></i>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                        </tr>  
+                                    @endeach
+                                    
+                                    {{--  We deleted the other tr elements that were here because we are going to now use a loop for the tr element above.  --}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{{--  Joe is using the at-endsection tag in order to end this section, but the documentation shows that you can end this with the at-end tag.  --}}
+@endsection

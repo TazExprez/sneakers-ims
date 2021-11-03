@@ -1,0 +1,52 @@
+{{--  Here we are making the create page.  You cannot skip a line between this comment and the @layout tag, or you will have issues.  --}}
+@layout('layouts.admin')
+
+@section('breadcrumbs')
+    <div class="breadcrumbs-area clearfix">
+        <h4 class="page-title pull-left">Brands</h4>
+        <ul class="breadcrumbs pull-left">
+            <li><a href="/admin">Dashboard</a></li>
+            <li><a href="/admin/brands">All Brands</a></li>
+            <li><span>Create New Brand</span></li>
+        </ul>
+    </div>
+@endsection
+
+@section('content')
+    <div class="row">
+        {{--  We copy and pasted this form from the SRTDash template.  We took it from the Form subsection in the UI Features section.  --}}
+        <div class="col-12 mt-5">
+            <div class="card">
+                <div class="card-body">
+                    {{--  This is a form, so we actually have to use the form tag. We are going to be using the post method with this form.  We are going to submit the form to the /admin/products URL, so we set the action to that.  --}}
+                    <form action="/admin/brands" method="post">
+                        {{--  In order to use a CSRF token, you just have to put the csrfField function at the top of the form in your edge templates.  This will generate a CSRF token in the backend.  --}}
+                        {{--  Joe said that this function will create an input type hidden field with a CSRF value.  When we inpected the page, there indeed was an input element with the type hidden, the name _csrf, and a long random value.  Every time we refresed the page, the random value would change.  --}}
+                        {{--  After we put the csrfField function below, we are submitting the form, but nothing is happening.  This is happening because we did not put anything in the store function in the ProductController.js file.  After we made the store function return the string Hey!, it would return the string when we submitted the form.  This is happening because we use the store method of the ProductController class in order to handle POST requests to the /admin/products URL.  --}}
+                        {{ csrfField() }}
+                        <div class="form-group">
+                            <label for="example-text-input" class="col-form-label">Title</label>
+                            {{--  We are going to name each input according to the name of the corresponding column in the database.  --}}
+                            <input class="form-control" type="text" value="" name="title" id="example-text-input" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            {{--  We are just going to be getting the image URL because this course is focused on MySQL.  This is not really focused on the full stack.  In production, this would be a file upload.  If you want, you can add more features to this project after the lessons are done for this course.  --}}
+                            <label for="example-text-input" class="col-form-label">Image URL</label>
+                            {{--  We are going to name each input according to the name of the corresponding column in the database.  --}}
+                            <input class="form-control" type="text" value="" name="img_url" id="example-text-input" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label for="example-text-input" class="col-form-label">Description</label>
+                            <textarea class="form-control" name="description" id="" rows="8" cols="80"></textarea>
+                        </div>
+                        <div class="form-group">
+                            {{--  We had to change the button to the submit type because when it had the button type, the form would not be submitted.  --}}
+                            {{--  When we first submitted this form we got an Invalid CSRF token error.  CSRF stands for cross-site request forgery.  In order to get this form to work, we actually have to put in a CSRF token, which is going to save you from a CSRF attack.  When somebody is trying to make a POST request to your website, from another website, they will actually need the CSRF token, the code, in order to POST into your website.  This will save you from having people send bad things to your website.  In order to put this CSRF token, you just have to put the csrfField function at the top of the form.  --}}
+                            <button type="submit" class="btn btn-primary mb-3">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection

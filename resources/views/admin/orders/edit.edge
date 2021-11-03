@@ -1,0 +1,95 @@
+{{--  Here we are making the edit page.  --}}
+@layout('layouts.admin')
+
+@section('breadcrumbs')
+    <div class="breadcrumbs-area clearfix">
+        <h4 class="page-title pull-left">Products</h4>
+        <ul class="breadcrumbs pull-left">
+            <li><a href="/admin">Dashboard</a></li>
+            <li><a href="/admin/products">All Products</a></li>
+            <li><span>Edit {{product.title}}</span></li>
+        </ul>
+    </div>
+@endsection
+
+@section('content')
+    {{--  We copied this content section from the create.edge file because it is very similar to the content section on this edit.edge file.  --}}
+    <div class="row">
+        <div class="col-12 mt-5">
+            <div class="card">
+                <div class="card-body">
+                    {{--  Here we are going to spoof the HTTP method that this form is going to use.  With HTML forms, you can only use the GET or the POST methods.  With REST APIs you can use GET, POST, UPDATE, DELETE, and other methods.  To do this, we are going to attach a query parameter, which starts with a ?, to the end of the form element's action property.  We are going to write ?_method=PUT.  We could have also used the UPDATE method, but we used the PUT method in the route used for submitting updates to products.  In the routes.js file we wrote Route.put('/admin/products/:id', 'Admin/ProductController.update');.  When we do this spoof, we are telling the server that this is a POST method, but in reality, we want the server to run a PUT method.  --}}
+                    <form action="/admin/products/{{product.id}}?_method=PUT" method="post">
+                        {{ csrfField() }}
+                        <div class="form-group">
+                            <label for="example-text-input" class="col-form-label">Title</label>
+                            <input class="form-control" type="text" value="{{product.title}}" name="title" id="example-text-input" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label for="example-text-input" class="col-form-label">Image URL</label>
+                            <input class="form-control" type="text" value="{{product.img_url}}" name="img_url" id="example-text-input" autocomplete="off">
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-12 col-md-6">
+                                <label for="example-text-input" class="col-form-label">SKU</label>
+                                <input class="form-control" type="text" value="{{product.sku}}" name="sku" id="example-text-input" autocomplete="off">
+                            </div>
+                            <div class="col-sm-12 col-md-6">
+                                <label for="example-text-input" class="col-form-label">Material</label>
+                                <input class="form-control" type="text" value="{{product.material}}" name="material" id="example-text-input" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-12 col-md-4">
+                                <label for="example-text-input" class="col-form-label">Quantity</label>
+                                <input class="form-control" type="text" value="{{product.qty}}" name="qty" id="example-text-input" autocomplete="off">
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <label for="example-text-input" class="col-form-label">Size</label>
+                                <select class="custom-select" name="size">
+                                    {{--  There are a lot of things that you can do with AdonisJS, like you run some JavaScript in the view, which we are doing with the ternary operators in the option elements below.  --}}
+                                    <option value="7" {{(product.size == 7) ? 'selected="selected"' : ''}}>7</option>
+                                    <option value="7.5" {{(product.size == 7.5) ? 'selected="selected"' : ''}}>7.5</option>
+                                    <option value="8" {{(product.size == 8) ? 'selected="selected"' : ''}}>8</option>
+                                    <option value="8.5" {{(product.size == 8.5) ? 'selected="selected"' : ''}}>8.5</option>
+                                    <option value="9" {{(product.size == 9) ? 'selected="selected"' : ''}}>9</option>
+                                    <option value="9.5" {{(product.size == 9.5) ? 'selected="selected"' : ''}}>9.5</option>
+                                    <option value="10" {{(product.size == 10) ? 'selected="selected"' : ''}}>10</option>
+                                    <option value="10.5" {{(product.size == 10.5) ? 'selected="selected"' : ''}}>10.5</option>
+                                    <option value="11" {{(product.size == 11) ? 'selected="selected"' : ''}}>11</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-sm-12 col-md-4">
+                                {{--  We are going to leave the brands section alone for now because we have not really worked on the backend stuff for it.  --}}
+                                <label class="col-form-label">Brands</label>
+                                {{--  Now we are going to use a loop to populate the brand options in the select element below, so we want to loop over the options.  We are sending an [] to this edit.edge file containing {}s representing the different brands in the sneakers_ims.brands.  --}}
+                                {{--  We had to add a name property in the select element below and we had to set it to brand_id because we were getting a 1054 error of "Unkown column 'undefined' in 'where clause'".  The problem was not fixed by just doing this though.  Part of the issue was that we were not passing in a brand id in the post when we submitted it, we were just sending in a random value.  We were originally passing in a fixed manually entered value.  So we just assigned a value of 2 for the products.brand_id in MySQL Workbench for now.  We must have a valid value for the products.brand_id because we are doing an INNER JOIN in the method responsible for showing the product in the ProductController.js file.  After we did this, the issue was fixed.  That temporary manual entry fixed the issue and now we can select any brand that we want and the product will be updated.  We have to remember to name our select elements, just like we named all of the other form elements, to avoid the issue in the future.  --}}
+                                <select class="custom-select" name="brand_id">
+                                    {{--  We are looping over the brands [] and we are going to call each element in this [] brand.  We are getting all of these options from the database.  --}}
+                                    {{--  We also added a ternary operator later on for the selected property.  --}}
+                                    {{--  We are trying to have the product that is selected to show up, instead of the default of Adidas.  We did some changes below and noticed that the product.brand_id was originally showing up as undefined.  We had to bring in the products.brand_id in the edit() method in the ProductController.js file.  Now the selected product will be the one that is actually being worked on.  Joe had some issues with the spacing and had to copy and paste some stuff and try again.  Joe recommends not pressing enter and just continuing to write on the same line.  --}}
+                                    @each(brand in brands)
+                                        <option 
+                                            value="{{brand.id}}"
+                                            {{(brand.id == product.brand_id) ? 'selected="selected"' : ''}}
+                                        >
+                                            {{brand.title}}
+                                        </option>
+                                    @endeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="example-text-input" class="col-form-label">Description</label>
+                            <textarea class="form-control" name="description" id="" rows="8" cols="80">{{product.description}}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary mb-3">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
